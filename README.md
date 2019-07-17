@@ -150,24 +150,71 @@ class UserInfo extends Component {
       email: "",
       id: ""
     };
-    this.props.keycloak.loadUserInfo().then(userInfo => {
-      this.setState({
-        name: userInfo.name,
-        email: userInfo.email,
-        id: userInfo.sub
+    this.props.keycloak
+      .loadUserProfile()
+      .success(profile => {
+        this.setState({
+          username: profile.username,
+          email: profile.email,
+          id: profile.sub
+        });
+      })
+      .error(function() {
+        alert("Failed to load user profile");
       });
-    });
   }
 
   render() {
     return (
       <div className="UserInfo">
-        <p>Name: {this.state.name}</p>
+        <p>Username: {this.state.username}</p>
         <p>Email: {this.state.email}</p>
-        <p>ID: {this.state.id}</p>
       </div>
     );
   }
 }
 export default UserInfo;
 ```
+
+This component accepts a Keycloak instance from its parent, then uses the loadUserInfo method to extract the user’s data.
+
+Now for the logout button, place the following in `src/Logout.js`:
+
+```javascript
+import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
+
+class Logout extends Component {
+  logout() {
+    this.props.history.push("/");
+    this.props.keycloak.logout();
+  }
+
+  render() {
+    return <button onClick={() => this.logout()}>Logout</button>;
+  }
+}
+export default withRouter(Logout);
+```
+
+Similarly, this accepts a Keycloak instance from the parent, then uses its logout method. Note that it has to be called last – otherwise it would redirect you to the login form again. Adjust your `Secured.js:render()` method to show the following (be sure to remember the import of your components):
+
+```javascript
+render() {
+    if(this.state.keycloak) {
+      if(this.state.authenticated) return (
+        <div>
+          <p>This is a Keycloak-secured component of your application. You shouldn't be able
+          to see this unless you've authenticated with Keycloak.</p>
+          <UserInfo keycloak={this.state.keycloak} />
+          <Logout keycloak={this.state.keycloak} />
+        </div>
+      ); else return (<div>Unable to authenticate!</div>)
+    }
+    return (
+      <div>Initializing Keycloak...</div>
+    );
+  }
+```
+
+Thats it - the React frontend is now secured via a Keycloak backend and the user can login and logout via Keycloak.

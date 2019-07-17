@@ -8,21 +8,25 @@ class UserInfo extends Component {
       email: "",
       id: ""
     };
-    this.props.keycloak.loadUserInfo().then(userInfo => {
-      this.setState({
-        name: userInfo.name,
-        email: userInfo.email,
-        id: userInfo.sub
+    this.props.keycloak
+      .loadUserProfile()
+      .success(profile => {
+        this.setState({
+          username: profile.username,
+          email: profile.email,
+          id: profile.sub
+        });
+      })
+      .error(function() {
+        alert("Failed to load user profile");
       });
-    });
   }
 
   render() {
     return (
       <div className="UserInfo">
-        <p>Name: {this.state.name}</p>
+        <p>Username: {this.state.username}</p>
         <p>Email: {this.state.email}</p>
-        <p>ID: {this.state.id}</p>
       </div>
     );
   }

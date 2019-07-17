@@ -1,1 +1,21 @@
 .DS_Store
+
+keycloak-react/node_modules
+keycloak-react/.pnp
+keycloak-react/.pnp.js
+
+# testing
+keycloak-react/coverage
+
+# production
+keycloak-react/build
+
+# misc
+keycloak-react/.env.local
+keycloak-react/.env.development.local
+keycloak-react/.env.test.local
+keycloak-react/.env.production.local
+
+keycloak-react/npm-debug.log*
+keycloak-react/yarn-debug.log*
+keycloak-react/yarn-error.log*
